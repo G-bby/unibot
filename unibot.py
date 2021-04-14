@@ -2,7 +2,7 @@
 import discord
 from discord.ext import commands
 from discord.utils import get
-import trials
+import trials, member_plus
 import key #key.py contains the line: KEY = (discord bot client_id)
 import os
 #intents = discord.Intents()
@@ -90,6 +90,7 @@ async def promote(ctx, member : discord.Member, role):
                 await member.add_roles(member_role)
         elif role == "Member+":
             if member_plus_role in member.roles:
+                error = member_plus.newMemberPlus(member.mention)
                 await ctx.channel.send("User is already Member+")
             else:
                 #await client.get_channel(announcement_channelid).send(member.mention + "has been promoted to " + role + "!")
@@ -99,6 +100,7 @@ async def promote(ctx, member : discord.Member, role):
                 if member_role not in member.roles:
                     await member.add_roles(member_role)
                 await member.add_roles(member_plus_role)
+                error = member_plus.newMemberPlus(member.mention)
 
 @client.command(aliases = ['expire'])
 async def expiretrials(ctx):
@@ -119,6 +121,47 @@ async def checktrial(ctx):
         await ctx.channel.send("Your trial expires at " + trial['expiration'] + " PST")
     else:
         await ctx.channel.send("Only trials that became trial after 2021-04-13 can use this command")
+
+@client.command(aliases = ['us'])
+async def updateSocials(ctx, *, links):
+    member_plus_role = discord.utils.get(ctx.guild.roles, name="Member+")
+    if member_plus_role in ctx.author.roles:
+        memberplus = member_plus.updateSocials(ctx.author.mention, links)
+        if memberplus['userid'] != "NOT_FOUND":
+            await ctx.channel.send("Your socials have been updated in the database")
+        else:
+            await ctx.channel.send("Only Member+ can use this command")
+
+@client.command()
+async def clearSocials(ctx, userid):
+    admin_role = discord.utils.get(ctx.guild.roles, name="Admin")
+    if admin_role in ctx.author.roles:
+        memberplus = member_plus.updateSocials(userid, "")
+        if memberplus['userid'] != "NOT_FOUND":
+            await ctx.channel.send("This user's socials have been cleared")
+        else:
+            await ctx.channel.send("This user is not in the database")
+    else:
+        await ctx.channel.send("Only Admin can use this command")
+
+@client.command(aliases = ['upname'])
+async def updateMemPlusName(ctx, name):
+    if member_plus.nameTaken(name):
+            await ctx.channel.send("Name is already in use")
+    else:
+        memberplus = member_plus.updateName(ctx.author.mention, name)
+        if memberplus['userid'] != "NOT_FOUND":
+            await ctx.channel.send("Name has been updated in the database")
+        else:
+            await ctx.channel.send("Only Member+ can use this command")
+
+@client.command(aliases = ['s'])
+async def socials(ctx, name):
+    if member_plus.getSocials(name) != "":
+        await ctx.channel.send(member_plus.getSocials(name))
+    else:
+        await ctx.channel.send("This user has no socials in the database")
+
 
 @client.command(aliases=['q'])
 async def queue(ctx, *, link):

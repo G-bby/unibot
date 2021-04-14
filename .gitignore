@@ -2,7 +2,7 @@
 key.py
 
 #databases
-trials.json
+*.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
