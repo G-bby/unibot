@@ -11,7 +11,7 @@ def newTrial(userid):
     # -2 write error
     # -1 read error
     # 0 trial not found
-    # 1 trial renewed
+    # 1 trial added
 
     #read trial database
     try:
@@ -76,7 +76,6 @@ def renewTrial(userid):
     return exit_code
 
 def getTrial(userid):
-
     # read trial database
     try:
         with io.open(TRIALFILE, 'r') as trials_file:
@@ -129,5 +128,34 @@ def purgeTrials():
 
     return expired
 
+def removeTrial(userid):
+    exit_code = 0
+    # -2 write error
+    # -1 read error
+    # 0 trial not found
+    # 1 trial removed
 
+    #list of remaining trials
+    remaining = []
 
+    # read trial database
+    try:
+        with io.open(TRIALFILE, 'r') as trials_file:
+            trials = json.load(trials_file)
+    except Exception as e:
+        return -1
+
+    #renews trial
+    for dictionary in trials:
+        if userid != dictionary.get('userid'):
+            remaing.appent(dictionary)
+        else:
+            exit_code = 1
+
+    #updates database
+    try:
+        with io.open(TRIALFILE, 'w') as trials_file:
+            json.dump(remaining, trials_file, ensure_ascii=False)
+    except Exception as e:
+        return -2
+    return exit_code
