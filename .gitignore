@@ -1,3 +1,6 @@
+#pycharm stuff
+.idea/
+
 #secret key
 key.py
 
