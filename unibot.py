@@ -21,6 +21,15 @@ userrolename = "User"
 
 client_id=key.KEY
 
+#create databases if they don't exist
+if not os.path.exists(trials.TRIALFILE):
+    with open(trials.TRIALFILE, 'w') as trial_db:
+        trial_db.write("[]")
+
+if not os.path.exists(member_plus.MEMBERPLUSFILE):
+    with open(member_plus.MEMBERPLUSFILE, 'w') as memplus_db:
+        memplus_db.write("[]")
+
 if not os.path.exists(trials.TRIALFILE):
     with open(trials.TRIALFILE, 'w') as trial_db:
         trial_db.write("[]")
