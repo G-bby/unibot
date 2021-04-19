@@ -116,12 +116,14 @@ async def expiretrials(ctx):
     admin_role = discord.utils.get(ctx.guild.roles, name="Admin")
     if admin_role in ctx.author.roles:
         expired = trials.purgeTrials()
-
-    message = "The trial status for "
-    for trial in expired:
-        message += trial['userid'] + " "
-    message += "has expired. [remove role manually]"
-    await ctx.channel.send(message)
+        if len(expired) > 0:
+            message = "The trial status for "
+            for trial in expired:
+                message += trial['userid'] + " "
+            message += "has expired. [remove role manually]"
+        else:
+            message = "No trials have expired"
+        await ctx.channel.send(message)
 
 @client.command(aliases = ['check'])
 async def checktrial(ctx):
