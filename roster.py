@@ -1,4 +1,5 @@
-import os, io, json
+#roster management by G_bby
+import os, io, json, datetime
 ROSTERFILE = "roster.json"
 
 roster = []
@@ -25,7 +26,7 @@ def updateRank(userid, rank):
             found = True
 
     if not found:
-        roster.append({'userid':userid, 'name':userid, 'rank':rank, 'youtube':"update your youtube link with $youtube"})
+        roster.append({'userid':userid, 'name':userid, 'rank':rank, 'youtube':"update your youtube link with $youtube", 'time': datetime.datetime.now().isoformat()})
 
     try:
         with io.open(ROSTERFILE, 'w') as roster_file:
@@ -34,6 +35,26 @@ def updateRank(userid, rank):
         return -2
 
     return 1
+
+def remove(userid):
+    roster = []
+    remaining = []
+
+    try:
+        with io.open(ROSTERFILE, 'r') as roster_file:
+            roster = json.load(roster_file)
+    except Exception as e:
+        return -1
+
+    for person in roster:
+        if person.get('userid') != userid:
+            remaining.append(person)
+
+    try:
+        with io.open(ROSTERFILE, 'w') as roster_file:
+            json.dump(remaining, roster_file, ensure_ascii=False)
+    except Exception as e:
+        return -2
 
 
 def updateYouTube(userid, youtube):
@@ -73,7 +94,7 @@ def updateName(userid, name):
         return -1  # error reading roster file
 
     # updates name
-    user = {'userid': 'NOT_FOUND', 'name': 'NOT_SET', 'rank': 'NOT_FOUND', 'youtube': ""}
+    user = {'userid': 'NOT_FOUND', 'name': 'NOT_SET', 'rank': 'NOT_FOUND', 'youtube': "", 'time': ""}
     exists = 0
     for person in roster:
         if userid == person.get('userid'):

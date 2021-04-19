@@ -2,7 +2,7 @@
 import discord
 from discord.ext import commands
 from discord.utils import get
-import trials, member_plus
+import trials, member_plus, roster
 import key #key.py contains the line: KEY = (discord bot client_id)
 import os
 #intents = discord.Intents()
@@ -86,7 +86,8 @@ async def promote(ctx, member : discord.Member, role):
                 await ctx.channel.send("User is already Member")
             else:
                 #await client.get_channel(announcement_channelid).send(member.mention + "has been promoted to " + role + "!")
-                error = trials.newTrial(member.mention)
+                error = trials.newTrial(member.mention) #add to trial database
+                error = roster.updateRank(member.mention, "Trial")
                 await member.add_roles(trial_role)
         elif role == "Member":
             if member_role in member.roles:
@@ -97,6 +98,7 @@ async def promote(ctx, member : discord.Member, role):
                     error = trials.removeTrial(member.mention)
                     await member.remove_roles(trial_role)
                 await member.add_roles(member_role)
+                error = roster.updateRank(member.mention, "Member")
         elif role == "Member+":
             if member_plus_role in member.roles:
                 error = member_plus.newMemberPlus(member.mention)
@@ -110,6 +112,122 @@ async def promote(ctx, member : discord.Member, role):
                     await member.add_roles(member_role)
                 await member.add_roles(member_plus_role)
                 error = member_plus.newMemberPlus(member.mention)
+                error = roster.updateRank(member.mention, "Member+")
+
+@client.command(aliases=['rosteradd'])
+async def addtoroster(ctx, member : discord.Member, rank):
+    admin_role = discord.utils.get(ctx.guild.roles, name="Admin")
+    if admin_role in ctx.author.roles:
+        try:
+            error = roster.updateRank(member.mention, rank)
+        except Exception as e:
+            print(e)
+
+@client.command(aliases =['rosterremove'])
+async def removefromroster(ctx, member : discord.Member):
+    admin_role = discord.utils.get(ctx.guild.roles, name="Admin")
+    if admin_role in ctx.author.roles:
+        error = roster.remove(member.mention)
+
+@client.command(aliases = ['youtube'])
+async def updateyoutube(ctx, link):
+    error = roster.updateYouTube(ctx.author.mention, link)
+    if error == 1:
+        await ctx.channel.send("Youtube link updated!")
+    elif error == -3:
+        await ctx.channel.send("Only Trials and above can use this command")
+    elif error == -4:
+        await ctx.channel.send("Invalid youtube link")
+
+
+@client.command(aliases =['uproster'])
+async def updateRoster(ctx):
+    admin_role = discord.utils.get(ctx.guild.roles, name="Admin")
+    if admin_role in ctx.author.roles:
+        rosterlist = roster.getRoster()
+        rTrials = []
+        rMembers = []
+        rMemberPluses = []
+        rAdmins = []
+        rOwners = []
+
+        for person in rosterlist:
+            if person.get('rank') == "Trial":
+                rTrials.append(person)
+            elif person.get('rank') == "Member":
+                rMembers.append(person)
+            elif person.get('rank') == "Member+":
+                rMemberPluses.append(person)
+            elif person.get('rank') == "Admin":
+                rAdmins.append(person)
+            elif person.get('rank') == "Owner":
+                rOwners.append(person)
+            else:
+                print("user has invalid rank value\n")
+
+        mOwners = ""
+        mAdmins = ""
+        mMemberPluses = ""
+        mMembers = ""
+        mTrials = ""
+
+        #print Owners
+        mOwners += "** ----------------**\n:red_circle: **OWNERS** :red_circle:\n** ----------------**\n"
+
+        for owner in rOwners:
+            if len(mOwners) + len("***" + owner.get('name') + "***\n" + owner.get('youtube') + "\n\n") < 2000:
+                mOwners += "***" + owner.get('name') + "***\n" + owner.get('youtube') + "\n\n"
+            else:
+                await ctx.channel.send(mOwners)
+                mOwners = "***" + owner.get('name') + "***\n" + owner.get('youtube') + "\n\n"
+        await ctx.channel.send(mOwners)
+
+        # print Admins
+        mAdmins += "** ----------------**\n:red_circle: **ADMINS** :red_circle:\n** ----------------**\n"
+
+        for admin in rAdmins:
+            if len(mAdmins) + len("***" + admin.get('name') + "***\n" + admin.get('youtube') + "\n\n") < 2000:
+                mAdmins += "***" + admin.get('name') + "***\n" + admin.get('youtube') + "\n\n"
+            else:
+                await ctx.channel.send(mAdmins)
+                mAdmins = "***" + admin.get('name') + "***\n" + admin.get('youtube') + "\n\n"
+        await ctx.channel.send(mAdmins)
+
+        # print Member Pluses
+        mMemberPluses += "** ----------------**\n:green_circle: **MEMBER+S** :green_circle:\n** ----------------**\n"
+
+        for memberplus in rMemberPluses:
+            if len(mMemberPluses) + len("***" + memberplus.get('name') + "***\n" + memberplus.get('youtube') + "\n\n") < 2000:
+                mMemberPluses += "***" + memberplus.get('name') + "***\n" + memberplus.get('youtube') + "\n\n"
+            else:
+                await ctx.channel.send(mMemberPluses)
+                mMemberPluses = "***" + memberplus.get('name') + "***\n" + memberplus.get('youtube') + "\n\n"
+        await ctx.channel.send(mMemberPluses)
+
+        # print Members
+        mMembers += "** ----------------**\n:blue_circle: **MEMBERS** :blue_circle:\n** ----------------**\n"
+
+        for member in rMembers:
+            if len(mMembers) + len(
+                    "***" + member.get('name') + "***\n" + member.get('youtube') + "\n\n") < 2000:
+                mMembers += "***" + member.get('name') + "***\n" + member.get('youtube') + "\n\n"
+            else:
+                await ctx.channel.send(mMembers)
+                mMembers = "***" + member.get('name') + "***\n" + member.get('youtube') + "\n\n"
+        await ctx.channel.send(mMembers)
+
+        # print Trials
+        mTrials += "** ----------------**\n:yellow_circle: **TRIALS** :yellow_circle:\n** ----------------**\n"
+
+        for trial in rTrials:
+            if len(mTrials) + len(
+                    "***" + trial.get('name') + "***\n" + trial.get('youtube') + "\n\n") < 2000:
+                mTrials += "***" + trial.get('name') + "***\n" + trial.get('youtube') + "\n\n"
+            else:
+                await ctx.channel.send(mTrials)
+                mTrials = "***" + trial.get('name') + "***\n" + trial.get('youtube') + "\n\n"
+        await ctx.channel.send(mTrials)
+
 
 @client.command(aliases = ['expire'])
 async def expiretrials(ctx):
@@ -156,15 +274,24 @@ async def clearSocials(ctx, userid):
         await ctx.channel.send("Only Admin can use this command")
 
 @client.command(aliases = ['upname'])
-async def updateMemPlusName(ctx, name):
-    if member_plus.nameTaken(name):
-            await ctx.channel.send("Name is already in use")
+async def updateName(ctx, *, name):
+    member_plus_role = discord.utils.get(ctx.guild.roles, name="Member+")
+    if member_plus.nameTaken(name) or roster.nameTaken(name) or name.__contains__(" "):
+        await ctx.channel.send("Name is already in use or contains a space")
     else:
-        memberplus = member_plus.updateName(ctx.author.mention, name)
-        if memberplus['userid'] != "NOT_FOUND":
-            await ctx.channel.send("Name has been updated in the database")
+        person = roster.updateName(ctx.author.mention, name)
+        if person['userid'] != "NOT_FOUND":
+            await ctx.channel.send("Name has been updated in the roster database")
         else:
-            await ctx.channel.send("Only Member+ can use this command")
+            await ctx.channel.send("Only Trials, Members, and Member+ can use this command")
+
+        # update mem+ name
+        if member_plus_role in ctx.author.roles:
+                memberplus = member_plus.updateName(ctx.author.mention, name)
+                if memberplus['userid'] != "NOT_FOUND":
+                    await ctx.channel.send("Name has been updated in the Member+ database")
+                else:
+                    await ctx.channel.send("You are not in the Member+ database")
 
 @client.command(aliases = ['s'])
 async def socials(ctx, name):
