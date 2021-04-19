@@ -244,12 +244,20 @@ async def expiretrials(ctx):
         await ctx.channel.send(message)
 
 @client.command(aliases = ['check'])
-async def checktrial(ctx):
-    trial = trials.getTrial(ctx.author.mention)
-    if trial['userid'] != "NOT_FOUND":
-        await ctx.channel.send("Your trial expires at " + trial['expiration'] + " PST")
+async def checktrial(ctx, *, member : discord.Member = "test"):
+    admin_role = discord.utils.get(ctx.guild.roles, name="Admin")
+    if admin_role in ctx.author.roles:
+        trial = trials.getTrial(member.mention)
+        if trial['userid'] != "NOT_FOUND":
+            await ctx.channel.send("User's trial expires at " + trial['expiration'] + " PST")
+        else:
+            await ctx.channel.send("User is not trial")
     else:
-        await ctx.channel.send("Only trials that became trial after 2021-04-13 can use this command")
+        trial = trials.getTrial(ctx.author.mention)
+        if trial['userid'] != "NOT_FOUND":
+            await ctx.channel.send("Your trial expires at " + trial['expiration'] + " PST")
+        else:
+            await ctx.channel.send("Only trials that became trial after 2021-04-13 can use this command")
 
 @client.command(aliases = ['us'])
 async def updateSocials(ctx, *, links):
