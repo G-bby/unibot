@@ -410,26 +410,7 @@ async def ratiotoresolutions(ctx, w=16, h=9):
 
 @client.command(aliases=['h'])
 async def unibothelp(ctx):
-    admin_role = discord.utils.get(ctx.guild.roles, name="Admin")
-    member_role = discord.utils.get(ctx.guild.roles, name="Member")
-    trial_role = discord.utils.get(ctx.guild.roles, name="Trial")
-    await ctx.channel.send("---Uni-Bot-Commands---\n"
-                           "$velo -- sends the t3c velocity tutorial\n"
-                           "$plugins or $paste -- sends the plugins pastebin\n"
-                           "$app <link> -- sends in an application to Uni (only works in apps channel)")
-
-    if member_role in ctx.author.roles or trial_role in ctx.author.roles:
-        await ctx.channel.send("---Member/Trial-Commands---\n"
-                               "$queue <links> or $q <links> -- submits an edit to be uploaded to Uni channel (only works in submit-uploads channel)")
-
-    if admin_role in ctx.author.roles:
-        await ctx.channel.send("---Admin-Commands---\n"
-                               "$clear <number> or $c <number> -- deletes the last <number> messages from current channel\n"
-                               "$kick @user <reason> or $k @user <reason> -- kicks a user for a reason\n"
-                               "$ban @user <reason> or $b @user <reason> -- bans a user for a reason\n"
-                               "$mute @user <reason> or $m @user <reason> -- mutes a user for a reason\n"
-                               "$unmute @user or $um @user -- unmutes a user\n"
-                               "$promote @user <Trial/Member/Member+> or $p @user <Trial/Member/Member+> -- promotes a user to specified role")
+    await ctx.channel.send("Documentation for UniBot is now on GitHub: https://github.com/G-bby/unibot")
 
 @client.command()
 async def ping(ctx):
@@ -444,7 +425,7 @@ async  def info_error(ctx, error):
 async def info_error(ctx, error):
     if isinstance(error, commands.errors.MissingRequiredArgument):
         await ctx.channel.purge(limit=1)
-        await ctx.send("Usage: $app <link>")
+        await ctx.send("Usage: $app")
 
 
 @kick.error
