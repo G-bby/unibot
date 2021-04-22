@@ -118,6 +118,11 @@ async def promote(ctx, member : discord.Member, role):
                 error = member_plus.newMemberPlus(member.mention)
                 error = roster.updateRank(member.mention, "Member+")
 
+                #pull name from roster database if available
+                name = roster.getName(member.mention)
+                if name != "NOT-FOUND":
+                    error = member_plus.updateName(member.mention, name)
+
 @client.command(aliases=['rosteradd'])
 async def addtoroster(ctx, member : discord.Member, rank):
     admin_role = discord.utils.get(ctx.guild.roles, name="Admin")

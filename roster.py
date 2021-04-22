@@ -110,6 +110,21 @@ def updateName(userid, name):
 
     return user
 
+def getName(userid):
+    # read roster database
+    try:
+        with io.open(ROSTERFILE, 'r') as roster_file:
+            roster = json.load(roster_file)
+    except Exception as e:
+        print("error reading roster file")
+
+
+    for person in roster:
+        if userid == person.get('userid'):
+            return person['name']
+
+    return "NOT-FOUND"
+
 def nameTaken(name):
     exit_code = 0
 
