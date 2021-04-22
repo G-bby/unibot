@@ -97,6 +97,8 @@ async def promote(ctx, member : discord.Member, role):
                 if trial_role in member.roles:
                     error = trials.removeTrial(member.mention)
                     await member.remove_roles(trial_role)
+                    # remove user from trial database
+                    trials.removeTrial(member.mention)
                 await member.add_roles(member_role)
                 error = roster.updateRank(member.mention, "Member")
         elif role == "Member+":
@@ -108,6 +110,8 @@ async def promote(ctx, member : discord.Member, role):
                 if trial_role in member.roles:
                     error = trials.removeTrial(member.mention)
                     await member.remove_roles(trial_role)
+                    # remove user from trial database
+                    trials.removeTrial(member.mention)
                 if member_role not in member.roles:
                     await member.add_roles(member_role)
                 await member.add_roles(member_plus_role)
@@ -238,6 +242,7 @@ async def expiretrials(ctx):
             message = "The trial status for "
             for trial in expired:
                 message += trial['userid'] + " "
+                error = roster.updateRank(trial['userid'], "Expired")
             message += "has expired. [remove role manually]"
         else:
             message = "No trials have expired"
