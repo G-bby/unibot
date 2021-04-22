@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 from discord.utils import get
 import trials, member_plus, roster
-import key #key.py contains the line: KEY = (discord bot client_id)
+import secrets #secrets.py contains the line: KEY = (discord bot client_id) and PASTE = (link to pastebin)
 import os
 #intents = discord.Intents()
 #intents.members = True
@@ -19,7 +19,7 @@ admin_role_tag = "<@&791663054940012565>"
 
 userrolename = "User"
 
-client_id=key.KEY
+client_id=secrets.KEY
 
 #create databases if they don't exist
 if not os.path.exists(trials.TRIALFILE):
@@ -348,7 +348,7 @@ async def unmute(ctx,member : discord.Member):
 
 @client.command(aliases = ['paste'])
 async def plugins(ctx):
-    await ctx.channel.send("***REMOVED***")
+    await ctx.channel.send(secrets.PASTE)
 
 @client.command(aliases=['luma'])
 async def lumamatte(ctx):

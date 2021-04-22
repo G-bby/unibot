@@ -1,8 +1,8 @@
 #pycharm stuff
 .idea/
 
-#secret key
-key.py
+#secrets
+secrets.py
 
 #databases
 *.json
