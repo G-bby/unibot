@@ -6,6 +6,7 @@ secrets.py
 
 #databases
 *.json
+*.json.old
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

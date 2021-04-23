@@ -21,6 +21,9 @@ userrolename = "User"
 
 client_id=secrets.KEY
 
+def fixuid(userid):
+    return userid.replace('!', '')
+
 #create databases if they don't exist
 if not os.path.exists(trials.TRIALFILE):
     with open(trials.TRIALFILE, 'w') as trial_db:
@@ -81,57 +84,57 @@ async def promote(ctx, member : discord.Member, role):
         if role == "Trial":
             if trial_role in member.roles:
                 await ctx.channel.send("User Trial has been renewed")
-                error = trials.renewTrial(member.mention)
-                error = roster.updateRank(member.mention, "Trial")
+                error = trials.renewTrial(fixuid(member.mention))
+                error = roster.updateRank(fixuid(member.mention), "Trial")
             elif member_role in member.roles:
                 await ctx.channel.send("User is already Member")
             else:
                 #await client.get_channel(announcement_channelid).send(member.mention + "has been promoted to " + role + "!")
-                error = trials.newTrial(member.mention) #add to trial database
-                error = roster.updateRank(member.mention, "Trial")
+                error = trials.newTrial(fixuid(member.mention)) #add to trial database
+                error = roster.updateRank(fixuid(member.mention), "Trial")
                 await member.add_roles(trial_role)
         elif role == "Member":
             if member_role in member.roles:
                 await ctx.channel.send("User is already Member")
-                error = roster.updateRank(member.mention, "Member")
+                error = roster.updateRank(fixuid(member.mention), "Member")
             else:
                 #await client.get_channel(announcement_channelid).send(member.mention + "has been promoted to " + role + "!")
                 if trial_role in member.roles:
-                    error = trials.removeTrial(member.mention)
+                    error = trials.removeTrial(fixuid(member.mention))
                     await member.remove_roles(trial_role)
                     # remove user from trial database
-                    trials.removeTrial(member.mention)
+                    trials.removeTrial(fixuid(member.mention))
                 await member.add_roles(member_role)
-                error = roster.updateRank(member.mention, "Member")
+                error = roster.updateRank(fixuid(member.mention), "Member")
         elif role == "Member+":
             if member_plus_role in member.roles:
-                error = member_plus.newMemberPlus(member.mention)
-                error = roster.updateRank(member.mention, "Member+")
+                error = member_plus.newMemberPlus(fixuid(member.mention))
+                error = roster.updateRank(fixuid(member.mention), "Member+")
                 await ctx.channel.send("User is already Member+")
             else:
                 #await client.get_channel(announcement_channelid).send(member.mention + "has been promoted to " + role + "!")
                 if trial_role in member.roles:
-                    error = trials.removeTrial(member.mention)
+                    error = trials.removeTrial(fixuid(member.mention))
                     await member.remove_roles(trial_role)
                     # remove user from trial database
-                    trials.removeTrial(member.mention)
+                    trials.removeTrial(fixuid(member.mention))
                 if member_role not in member.roles:
                     await member.add_roles(member_role)
                 await member.add_roles(member_plus_role)
-                error = member_plus.newMemberPlus(member.mention)
-                error = roster.updateRank(member.mention, "Member+")
+                error = member_plus.newMemberPlus(fixuid(member.mention))
+                error = roster.updateRank(fixuid(member.mention), "Member+")
 
                 #pull name from roster database if available
-                name = roster.getName(member.mention)
+                name = roster.getName(fixuid(member.mention))
                 if name != "NOT-FOUND":
-                    error = member_plus.updateName(member.mention, name)
+                    error = member_plus.updateName(fixuid(member.mention), name)
 
 @client.command(aliases=['rosteradd'])
 async def addtoroster(ctx, member : discord.Member, rank):
     admin_role = discord.utils.get(ctx.guild.roles, name="Admin")
     if admin_role in ctx.author.roles:
         try:
-            error = roster.updateRank(member.mention, rank)
+            error = roster.updateRank(fixuid(member.mention), rank)
         except Exception as e:
             print(e)
 
@@ -139,11 +142,11 @@ async def addtoroster(ctx, member : discord.Member, rank):
 async def removefromroster(ctx, member : discord.Member):
     admin_role = discord.utils.get(ctx.guild.roles, name="Admin")
     if admin_role in ctx.author.roles:
-        error = roster.remove(member.mention)
+        error = roster.remove(fixuid(member.mention))
 
 @client.command(aliases = ['youtube'])
 async def updateyoutube(ctx, link):
-    error = roster.updateYouTube(ctx.author.mention, link)
+    error = roster.updateYouTube(fixuid(ctx.author.mention), link)
     if error == 1:
         await ctx.channel.send("Youtube link updated!")
     elif error == -3:
@@ -206,7 +209,7 @@ async def updateRoster(ctx):
         await ctx.channel.send(mAdmins)
 
         # print Member Pluses
-        mMemberPluses += "** ----------------**\n:green_circle: **MEMBER+S** :green_circle:\n** ----------------**\n"
+        mMemberPluses += "** ----------------**\n:green_circle: **MEMBERS+** :green_circle:\n** ----------------**\n"
 
         for memberplus in rMemberPluses:
             if len(mMemberPluses) + len("***" + memberplus.get('name') + "***\n" + memberplus.get('youtube') + "\n\n") < 2000:
@@ -260,9 +263,9 @@ async def expiretrials(ctx):
 async def checktrial(ctx, *, member : discord.Member = "test"):
     admin_role = discord.utils.get(ctx.guild.roles, name="Admin")
     if admin_role in ctx.author.roles:
-        trial = trials.getTrial(member.mention)
+        trial = trials.getTrial(fixuid(member.mention))
         if trial['userid'] != "NOT_FOUND":
-            await ctx.channel.send("User's trial expires at " + trial['expiration'] + " PST")
+            await ctx.channel.send("User's trial expires at " + trial['expiration'])
         else:
             await ctx.channel.send("User is not trial")
     else:
