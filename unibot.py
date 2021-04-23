@@ -82,6 +82,7 @@ async def promote(ctx, member : discord.Member, role):
             if trial_role in member.roles:
                 await ctx.channel.send("User Trial has been renewed")
                 error = trials.renewTrial(member.mention)
+                error = roster.updateRank(member.mention, "Trial")
             elif member_role in member.roles:
                 await ctx.channel.send("User is already Member")
             else:
@@ -92,6 +93,7 @@ async def promote(ctx, member : discord.Member, role):
         elif role == "Member":
             if member_role in member.roles:
                 await ctx.channel.send("User is already Member")
+                error = roster.updateRank(member.mention, "Member")
             else:
                 #await client.get_channel(announcement_channelid).send(member.mention + "has been promoted to " + role + "!")
                 if trial_role in member.roles:
@@ -104,6 +106,7 @@ async def promote(ctx, member : discord.Member, role):
         elif role == "Member+":
             if member_plus_role in member.roles:
                 error = member_plus.newMemberPlus(member.mention)
+                error = roster.updateRank(member.mention, "Member+")
                 await ctx.channel.send("User is already Member+")
             else:
                 #await client.get_channel(announcement_channelid).send(member.mention + "has been promoted to " + role + "!")
