@@ -186,37 +186,40 @@ async def updateRoster(ctx):
         mMembers = ""
         mTrials = ""
 
+        #print change name message
+        await ctx.channel.send("If you do not want to be tagged in further roster messages please use $upname <name> to change your name")
+
         #print Owners
         mOwners += "** ----------------**\n:red_circle: **OWNERS** :red_circle:\n** ----------------**\n"
 
         for owner in rOwners:
-            if len(mOwners) + len("***" + owner.get('name') + "***\n" + owner.get('youtube') + "\n\n") < 2000:
-                mOwners += "***" + owner.get('name') + "***\n" + owner.get('youtube') + "\n\n"
+            if len(mOwners) + len("***" + owner.get('name') + "***\n" + "<" + owner.get('youtube') + ">\n\n") < 2000:
+                mOwners += "***" + owner.get('name') + "***\n" + "<" + owner.get('youtube') + ">\n\n"
             else:
                 await ctx.channel.send(mOwners)
-                mOwners = "***" + owner.get('name') + "***\n" + owner.get('youtube') + "\n\n"
+                mOwners = "***" + owner.get('name') + "***\n" + "<" + owner.get('youtube') + ">\n\n"
         await ctx.channel.send(mOwners)
 
         # print Admins
         mAdmins += "** ----------------**\n:red_circle: **ADMINS** :red_circle:\n** ----------------**\n"
 
         for admin in rAdmins:
-            if len(mAdmins) + len("***" + admin.get('name') + "***\n" + admin.get('youtube') + "\n\n") < 2000:
-                mAdmins += "***" + admin.get('name') + "***\n" + admin.get('youtube') + "\n\n"
+            if len(mAdmins) + len("***" + admin.get('name') + "***\n" + "<" + admin.get('youtube') + ">\n\n") < 2000:
+                mAdmins += "***" + admin.get('name') + "***\n" + "<" + admin.get('youtube') + ">\n\n"
             else:
                 await ctx.channel.send(mAdmins)
-                mAdmins = "***" + admin.get('name') + "***\n" + admin.get('youtube') + "\n\n"
+                mAdmins = "***" + admin.get('name') + "***\n" + "<" + admin.get('youtube') + ">\n\n"
         await ctx.channel.send(mAdmins)
 
         # print Member Pluses
         mMemberPluses += "** ----------------**\n:green_circle: **MEMBERS+** :green_circle:\n** ----------------**\n"
 
         for memberplus in rMemberPluses:
-            if len(mMemberPluses) + len("***" + memberplus.get('name') + "***\n" + memberplus.get('youtube') + "\n\n") < 2000:
-                mMemberPluses += "***" + memberplus.get('name') + "***\n" + memberplus.get('youtube') + "\n\n"
+            if len(mMemberPluses) + len("***" + memberplus.get('name') + "***\n" + "<" + memberplus.get('youtube') + ">\n\n") < 2000:
+                mMemberPluses += "***" + memberplus.get('name') + "***\n" + "<" + memberplus.get('youtube') + ">\n\n"
             else:
                 await ctx.channel.send(mMemberPluses)
-                mMemberPluses = "***" + memberplus.get('name') + "***\n" + memberplus.get('youtube') + "\n\n"
+                mMemberPluses = "***" + memberplus.get('name') + "***\n" + "<" + memberplus.get('youtube') + ">\n\n"
         await ctx.channel.send(mMemberPluses)
 
         # print Members
@@ -224,11 +227,11 @@ async def updateRoster(ctx):
 
         for member in rMembers:
             if len(mMembers) + len(
-                    "***" + member.get('name') + "***\n" + member.get('youtube') + "\n\n") < 2000:
-                mMembers += "***" + member.get('name') + "***\n" + member.get('youtube') + "\n\n"
+                    "***" + member.get('name') + "***\n" + "<" + member.get('youtube') + ">\n\n") < 2000:
+                mMembers += "***" + member.get('name') + "***\n" + "<" + member.get('youtube') + ">\n\n"
             else:
                 await ctx.channel.send(mMembers)
-                mMembers = "***" + member.get('name') + "***\n" + member.get('youtube') + "\n\n"
+                mMembers = "***" + member.get('name') + "***\n" + "<" + member.get('youtube') + ">\n\n"
         await ctx.channel.send(mMembers)
 
         # print Trials
@@ -236,11 +239,11 @@ async def updateRoster(ctx):
 
         for trial in rTrials:
             if len(mTrials) + len(
-                    "***" + trial.get('name') + "***\n" + trial.get('youtube') + "\n\n") < 2000:
-                mTrials += "***" + trial.get('name') + "***\n" + trial.get('youtube') + "\n\n"
+                    "***" + trial.get('name') + "***\n" + "<" + trial.get('youtube') + ">\n\n") < 2000:
+                mTrials += "***" + trial.get('name') + "***\n" + "<" + trial.get('youtube') + ">\n\n"
             else:
                 await ctx.channel.send(mTrials)
-                mTrials = "***" + trial.get('name') + "***\n" + trial.get('youtube') + "\n\n"
+                mTrials = "***" + trial.get('name') + "***\n" + "<" + trial.get('youtube') + ">\n\n"
         await ctx.channel.send(mTrials)
 
 
