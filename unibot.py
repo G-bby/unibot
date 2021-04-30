@@ -186,6 +186,9 @@ async def updateRoster(ctx):
         mMembers = ""
         mTrials = ""
 
+        #purge old roster
+        await ctx.channel.purge(limit=10)
+
         #print change name message
         await ctx.channel.send("If you do not want to be tagged in further roster messages please use $upname <name> to change your name")
 
