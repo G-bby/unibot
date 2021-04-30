@@ -272,7 +272,7 @@ async def checktrial(ctx, *, member : discord.Member = "test"):
         else:
             await ctx.channel.send("User is not trial")
     else:
-        trial = trials.getTrial(ctx.author.mention)
+        trial = trials.getTrial(fixuid(ctx.author.mention))
         if trial['userid'] != "NOT_FOUND":
             await ctx.channel.send("Your trial expires at " + trial['expiration'] + " PST")
         else:
@@ -282,7 +282,7 @@ async def checktrial(ctx, *, member : discord.Member = "test"):
 async def updateSocials(ctx, *, links):
     member_plus_role = discord.utils.get(ctx.guild.roles, name="Member+")
     if member_plus_role in ctx.author.roles:
-        memberplus = member_plus.updateSocials(ctx.author.mention, links)
+        memberplus = member_plus.updateSocials(fixuid(ctx.author.mention), links)
         if memberplus['userid'] != "NOT_FOUND":
             await ctx.channel.send("Your socials have been updated in the database")
         else:
@@ -306,7 +306,7 @@ async def updateName(ctx, *, name):
     if member_plus.nameTaken(name) or roster.nameTaken(name) or name.__contains__(" "):
         await ctx.channel.send("Name is already in use or contains a space")
     else:
-        person = roster.updateName(ctx.author.mention, name)
+        person = roster.updateName(fixuid(ctx.author.mention), name)
         if person['userid'] != "NOT_FOUND":
             await ctx.channel.send("Name has been updated in the roster database")
         else:
@@ -314,7 +314,7 @@ async def updateName(ctx, *, name):
 
         # update mem+ name
         if member_plus_role in ctx.author.roles:
-                memberplus = member_plus.updateName(ctx.author.mention, name)
+                memberplus = member_plus.updateName(fixuid(ctx.author.mention), name)
                 if memberplus['userid'] != "NOT_FOUND":
                     await ctx.channel.send("Name has been updated in the Member+ database")
                 else:
