@@ -148,7 +148,7 @@ def removeTrial(userid):
     #renews trial
     for dictionary in trials:
         if userid != dictionary.get('userid'):
-            remaining.appent(dictionary)
+            remaining.append(dictionary)
         else:
             exit_code = 1
 
