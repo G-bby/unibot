@@ -372,7 +372,7 @@ async def velocity(ctx):
     await ctx.channel.send("https://www.youtube.com/watch?v=sqyFfIeSIH0")
 
 @client.command(aliases=['sfx'])
-async def velocity(ctx):
+async def soundeffects(ctx):
     await ctx.channel.send("https://docs.google.com/document/d/1NU2K9NOb-QjY1CqJ-WF7gqQ3YAETLb7nBVly1yxd7G4/edit")
 
 @client.command(aliases=['dof'])
