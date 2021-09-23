@@ -5,6 +5,7 @@ from discord.utils import get
 import trials, member_plus, roster
 import secrets #secrets.py contains the line: KEY = (discord bot client_id) and PASTE = (link to pastebin)
 import os
+import random
 #intents = discord.Intents()
 #intents.members = True
 #client = commands.Bot(command_prefix="$", intents =intents)
@@ -128,6 +129,22 @@ async def promote(ctx, member : discord.Member, role):
                 name = roster.getName(fixuid(member.mention))
                 if name != "NOT-FOUND":
                     error = member_plus.updateName(fixuid(member.mention), name)
+
+@client.command(aliases=['d'])
+async def demote(ctx, member : discord.Member):
+    admin_role = discord.utils.get(ctx.guild.roles, name="Admin")
+    trial_role = discord.utils.get(ctx.guild.roles, name="Trial")
+    member_role = discord.utils.get(ctx.guild.roles, name="Member")
+    member_plus_role = discord.utils.get(ctx.guild.roles, name="Member+")
+    if admin_role in ctx.author.roles:
+        if trial_role in member.roles:
+            error = trials.removeTrial(fixuid(member.mention))
+            await member.remove_roles(trial_role)
+        if member_role in member.roles:
+            await member.remove_roles(member_role)
+        if member_plus_role in member.roles:
+            await member.remove_roles(member_plus_role)
+        roster.updateRank(fixuid(member.mention), "Removed")
 
 @client.command(aliases=['rosteradd'])
 async def addtoroster(ctx, member : discord.Member, rank):

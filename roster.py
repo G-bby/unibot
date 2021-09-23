@@ -25,7 +25,7 @@ def updateRank(userid, rank):
             person['rank'] = rank
             found = True
 
-    if not found:
+    if not found and rank is not "Removed":
         roster.append({'userid':userid, 'name':userid, 'rank':rank, 'youtube':"update your youtube link with $youtube", 'time': datetime.datetime.now().isoformat()})
 
     try:
