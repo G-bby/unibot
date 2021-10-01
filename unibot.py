@@ -1,4 +1,5 @@
 #unibot v1.1 by G_bby
+import io, json, datetime
 import discord
 from discord.ext import commands
 from discord.utils import get
@@ -19,6 +20,7 @@ muted_roleid = 745010908761161739
 admin_role_tag = "<@&791663054940012565>"
 
 userrolename = "User"
+QUEUEFILE = "queuefile.json"
 
 client_id=secrets.KEY
 
@@ -354,8 +356,28 @@ async def queue(ctx, *, link):
         trial_role = discord.utils.get(ctx.guild.roles, name="Trial")
         member_role = discord.utils.get(ctx.guild.roles, name="Member")
         if trial_role in ctx.author.roles or member_role in ctx.author.roles:
-            await client.get_channel(admin_upload_queue_channelid).send(ctx.author.mention + " has queued an edit for upload: " + link)
-            await ctx.channel.send("Your upload has been queued.")
+            
+            try:
+                with io.open(QUEUEFILE, 'r') as qfile:
+                    queuemonths = json.load(qfile)
+            except Exception as e:
+                print("Failed")
+            alreadyqd = False
+            for entry in queuemonths:
+                if entry.get('userid') == fixuid(ctx.author.mention) and entry.get('month') == datetime.datetime.now().strftime("%m"):
+                    await ctx.channel.send("You have already queued an edit this month.")
+                    alreadyqd = True
+            print(alreadyqd)
+            if alreadyqd == False:
+                queuemonths.append({'userid':fixuid(ctx.author.mention), 'month': datetime.datetime.now().strftime("%m")})
+                try:
+                    await ctx.channel.send(str(queuemonths))
+                    with io.open(QUEUEFILE, 'w') as qfile:
+                        json.dump(queuemonths, qfile, ensure_ascii=False)
+                except Exception as e:
+                    print("Failed")
+                await client.get_channel(admin_upload_queue_channelid).send(ctx.author.mention + " has queued an edit for upload: " + link)
+                await ctx.channel.send("Your upload has been queued.")
 
 
 @client.command(aliases = ['m'])
