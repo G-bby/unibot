@@ -3,7 +3,7 @@ import io, json, datetime
 import discord
 from discord.ext import commands
 from discord.utils import get
-import trials, member_plus, roster
+import trials, roster
 import secrets #secrets.py contains the line: KEY = (discord bot client_id) and PASTE = (link to pastebin)
 import os
 import random
@@ -31,10 +31,6 @@ def fixuid(userid):
 if not os.path.exists(trials.TRIALFILE):
     with open(trials.TRIALFILE, 'w') as trial_db:
         trial_db.write("[]")
-
-if not os.path.exists(member_plus.MEMBERPLUSFILE):
-    with open(member_plus.MEMBERPLUSFILE, 'w') as memplus_db:
-        memplus_db.write("[]")
 
 if not os.path.exists(trials.TRIALFILE):
     with open(trials.TRIALFILE, 'w') as trial_db:
@@ -111,7 +107,6 @@ async def promote(ctx, member : discord.Member, role):
                 error = roster.updateRank(fixuid(member.mention), "Member")
         elif role == "Member+":
             if member_plus_role in member.roles:
-                error = member_plus.newMemberPlus(fixuid(member.mention))
                 error = roster.updateRank(fixuid(member.mention), "Member+")
                 await ctx.channel.send("User is already Member+")
             else:
@@ -124,13 +119,8 @@ async def promote(ctx, member : discord.Member, role):
                 if member_role not in member.roles:
                     await member.add_roles(member_role)
                 await member.add_roles(member_plus_role)
-                error = member_plus.newMemberPlus(fixuid(member.mention))
                 error = roster.updateRank(fixuid(member.mention), "Member+")
 
-                #pull name from roster database if available
-                name = roster.getName(fixuid(member.mention))
-                if name != "NOT-FOUND":
-                    error = member_plus.updateName(fixuid(member.mention), name)
 
 @client.command(aliases=['d'])
 async def demote(ctx, member : discord.Member):
@@ -300,32 +290,10 @@ async def checktrial(ctx, *, member : discord.Member = "test"):
         else:
             await ctx.channel.send("Only trials that became trial after 2021-04-13 can use this command")
 
-@client.command(aliases = ['us'])
-async def updateSocials(ctx, *, links):
-    member_plus_role = discord.utils.get(ctx.guild.roles, name="Member+")
-    if member_plus_role in ctx.author.roles:
-        memberplus = member_plus.updateSocials(fixuid(ctx.author.mention), links)
-        if memberplus['userid'] != "NOT_FOUND":
-            await ctx.channel.send("Your socials have been updated in the database")
-        else:
-            await ctx.channel.send("Only Member+ can use this command")
-
-@client.command()
-async def clearSocials(ctx, userid):
-    admin_role = discord.utils.get(ctx.guild.roles, name="Admin")
-    if admin_role in ctx.author.roles:
-        memberplus = member_plus.updateSocials(userid, "")
-        if memberplus['userid'] != "NOT_FOUND":
-            await ctx.channel.send("This user's socials have been cleared")
-        else:
-            await ctx.channel.send("This user is not in the database")
-    else:
-        await ctx.channel.send("Only Admin can use this command")
-
 @client.command(aliases = ['upname'])
 async def updateName(ctx, *, name):
     member_plus_role = discord.utils.get(ctx.guild.roles, name="Member+")
-    if member_plus.nameTaken(name) or roster.nameTaken(name) or name.__contains__(" "):
+    if roster.nameTaken(name) or name.__contains__(" "):
         await ctx.channel.send("Name is already in use or contains a space")
     else:
         person = roster.updateName(fixuid(ctx.author.mention), name)
@@ -334,21 +302,6 @@ async def updateName(ctx, *, name):
         else:
             await ctx.channel.send("Only Trials, Members, and Member+ can use this command")
 
-        # update mem+ name
-        if member_plus_role in ctx.author.roles:
-                memberplus = member_plus.updateName(fixuid(ctx.author.mention), name)
-                if memberplus['userid'] != "NOT_FOUND":
-                    await ctx.channel.send("Name has been updated in the Member+ database")
-                else:
-                    await ctx.channel.send("You are not in the Member+ database")
-
-@client.command(aliases = ['s'])
-async def socials(ctx, name):
-    if member_plus.getSocials(name) != "":
-        await ctx.channel.send(member_plus.getSocials(name))
-    else:
-        await ctx.channel.send("This user has no socials in the database")
-
 
 @client.command(aliases=['q'])
 async def queue(ctx, *, link):
@@ -356,7 +309,7 @@ async def queue(ctx, *, link):
         trial_role = discord.utils.get(ctx.guild.roles, name="Trial")
         member_role = discord.utils.get(ctx.guild.roles, name="Member")
         if trial_role in ctx.author.roles or member_role in ctx.author.roles:
-            
+
             try:
                 with io.open(QUEUEFILE, 'r') as qfile:
                     queuemonths = json.load(qfile)
